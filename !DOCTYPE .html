@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>本命鉴定 · 抽象人格测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .floating-emoji {
+            position: fixed;
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatEmoji 15s infinite linear;
+            opacity: 0.3;
+        }
+
+        @keyframes floatEmoji {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 80px;
+            padding: 25px 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: #c0392b;
+            text-shadow: 4px 4px 0 #f1c40f;
+            letter-spacing: 4px;
+        }
+
+        .header .sub {
+            color: #e67e22;
+            font-size: 1rem;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        .progress-area {
+            margin-bottom: 25px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 40px;
+            padding: 15px 20px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: #c0392b;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-bg {
+            background: #f5e6d3;
+            border-radius: 30px;
+            height: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #f39c12, #e74c3c);
+            width: 0%;
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.3s;
+        }
+
+        .card {
+            background: rgba(255, 248, 235, 0.96);
+            border-radius: 50px;
+            padding: 40px 35px;
+            border: 4px solid #f1c40f;
+            box-shadow: 0 15px 0 #e67e22;
+            transition: all 0.2s;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .question-num {
+            background: #f1c40f;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        .question-cat {
+            background: #ffeaa7;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            line-height: 1.4;
+        }
+
+        .score-options {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .score-btn {
+            flex: 1;
+            min-width: 70px;
+            background: #fef9e6;
+            border: 3px solid #f1c40f;
+            border-radius: 50px;
+            padding: 15px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .score-btn:hover {
+            transform: scale(1.05);
+            background: #ffeaa7;
+        }
+
+        .score-btn.selected {
+            background: #f1c40f;
+            border-color: #e67e22;
+            transform: scale(1.02);
+        }
+
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 25px;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-prev {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            border: 2px solid #bdc3c7;
+        }
+
+        .btn-next {
+            background: #f39c12;
+            color: white;
+            border: 2px solid #e67e22;
+            text-shadow: 1px 1px 0 #c0392b;
+        }
+
+        .result-card {
+            text-align: center;
+        }
+
+        .funny-face {
+            font-size: 8rem;
+            margin: 15px 0;
+            filter: drop-shadow(6px 8px 0 #f1c40f);
+            animation: wiggle 0.5s ease-out;
+        }
+
+        @keyframes wiggle {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(-10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        /* 抽象代号 - 大号显示 */
+        .abstract-code {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c0392b, #e67e22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .personality-name {
+            font-size: 1.8rem;
+            color: #c0392b;
+            background: #ffeaa7;
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 60px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .funny-desc {
+            background: #fef9e6;
+            border-radius: 35px;
+            padding: 25px;
+            text-align: left;
+            margin: 25px 0;
+            border-left: 10px solid #f1c40f;
+        }
+
+        .funny-desc p {
+            margin: 12px 0;
+            color: #2c3e50;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .funny-desc .quote {
+            font-style: italic;
+            color: #e67e22;
+            margin-top: 18px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .trait-bubbles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+
+        .trait-bubble {
+            background: #ffeaa7;
+            border-radius: 40px;
+            padding: 8px 22px;
+            font-size: 0.95rem;
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            background: #f39c12;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            font-family: inherit;
+            border-bottom: 5px solid #e67e22;
+        }
+
+        .restart-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px 20px;
+            }
+            .question-text {
+                font-size: 1.4rem;
+            }
+            .score-value {
+                font-size: 1.3rem;
+            }
+            .score-btn {
+                min-width: 55px;
+                padding: 10px 5px;
+            }
+            .funny-face {
+                font-size: 5rem;
+            }
+            .abstract-code {
+                font-size: 1.6rem;
+            }
+            .personality-name {
+                font-size: 1.3rem;
+            }
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="floatingEmojis"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔮 大便来袭 🔮</h1>
+            <div class="sub">测测你的抽象人格 · 不准不要钱</div>
+        </div>
+        <div id="app"></div>
+    </div>
+
+    <script>
+        // ============================================
+        // 本命鉴定 · 抽象人格测试
+        // 16种抽象搞笑人格 + 魔性表情 + 抽象代号
+        // ============================================
+
+        // 题目（4个维度 × 3题）
+        const questions = [
+            // 维度1：能量来源（内向外向）
+            { text: "周末没人约你，你的反应是？", dim: "dim1", left: "终于可以躺平了！", right: "孤独寂寞冷🥶" },
+            { text: "在KTV里，你通常是？", dim: "dim1", left: "角落玩手机的", right: "抢麦的麦霸" },
+            { text: "遇到陌生人，你会？", dim: "dim1", left: "社恐发作装死", right: "三分钟变兄弟" },
+            // 维度2：信息处理（实感直觉）
+            { text: "看说明书时，你？", dim: "dim2", left: "逐字逐句看完", right: "直接上手瞎搞" },
+            { text: "别人说“随便”时，你？", dim: "dim2", left: "真的随便了", right: "内心疯狂脑补" },
+            { text: "你的手机相册里？", dim: "dim2", left: "全是生活照", right: "全是表情包" },
+            // 维度3：决策方式（思考情感）
+            { text: "朋友找你哭诉，你会？", dim: "dim3", left: "分析问题+解决方案", right: "一起哭+递纸巾" },
+            { text: "看到感人的广告，你？", dim: "dim3", left: "内心毫无波澜", right: "哭得稀里哗啦" },
+            { text: "做决定时，你更看重？", dim: "dim3", left: "逻辑对错", right: "大家开心就好" },
+            // 维度4：生活态度（计划随性）
+            { text: "你的手机桌面是？", dim: "dim4", left: "分类文件夹", right: "乱成一锅粥" },
+            { text: "出门旅行前，你？", dim: "dim4", left: "攻略做到吐", right: "说走咱就走" },
+            { text: "你的口头禅更接近？", dim: "dim4", left: "我计划一下", right: "再说吧~" }
+        ];
+
+        // ============================================
+        // 16种抽象人格 - 没有MBTI代码，用抽象代号
+        // ============================================
+        const personalities = {
+            // 内向+实感+思考+判断
+            "0000": { 
+                face: "🧐", code: "⚙️·🪨·📐·🔒", name: "严谨的齿轮精", 
+                desc: "你的人生像一台精密的机器，每个齿轮都严丝合缝。你最讨厌计划被打乱，就像机器突然卡壳。朋友说你无趣？不，这叫稳定输出！",
+                quote: "『迟到1分钟也是迟到，这是原则问题』",
+                traits: ["强迫症晚期", "细节控", "人形日历"]
+            },
+            // 内向+实感+情感+判断
+            "0001": { 
+                face: "🥺", code: "🫂·🌱·💧·📦", name: "默默付出的树懒", 
+                desc: "你是朋友圈里的哆啦A梦，谁需要帮助你都会掏口袋。但你常常忘记照顾自己，就像那个永远给别人点赞却没人给你点赞的人。",
+                quote: "『没事，我来吧』（然后默默累死）",
+                traits: ["讨好型人格", "记忆大师", "隐形守护者"]
+            },
+            // 内向+直觉+情感+判断
+            "0011": { 
+                face: "🤔", code: "🌙·🌀·💗·🔮", name: "emo哲学家", 
+                desc: "你表面平静，内心已经上演了80集连续剧。你看透了世界的本质，所以选择在深夜emo。你的朋友觉得你很神秘，其实你只是懒得解释。",
+                quote: "『你不懂我，我不怪你』（其实很在意）",
+                traits: ["人间清醒", "深夜emo", "理想主义"]
+            },
+            // 内向+直觉+思考+判断
+            "0010": { 
+                face: "😎", code: "🧠·⚡·📊·🤖", name: "冷酷的AI机器人", 
+                desc: "你的大脑是一台超级计算机，情商是一台老年机。你觉得99%的人都是傻子，但你不说，你只是用眼神杀死他们。计划是你的信仰。",
+                quote: "『你说的都对，但我不听』",
+                traits: ["高冷面瘫", "计划狂魔", "人间AI"]
+            },
+            // 内向+实感+思考+感知
+            "0100": { 
+                face: "🔧", code: "🛠️·🧩·🔩·🎮", name: "动手狂魔工具人", 
+                desc: "给你一把螺丝刀，你能修好全世界。但给你一个约会，你只想回家打游戏。你是朋友圈里的实用主义者，社交场合中的透明人。",
+                quote: "『别BB，让我来』",
+                traits: ["手艺人", "社交恐惧", "冷静如冰"]
+            },
+            // 内向+实感+情感+感知
+            "0101": { 
+                face: "🎨", code: "🖌️·🌸·😌·🍃", name: "佛系艺术家", 
+                desc: "你活在自己的小世界里，画着别人看不懂的画，听着没人听过的歌。你不争不抢，佛系躺平，但内心住着一个躁动的灵魂。",
+                quote: "『随缘吧』（其实很有主见）",
+                traits: ["艺术细胞", "佛系青年", "隐形叛逆"]
+            },
+            // 内向+直觉+情感+感知
+            "0111": { 
+                face: "🥹", code: "😭·🌈·☁️·🦋", name: "流泪猫猫头", 
+                desc: "你是行走的泪腺，看什么都感动，想什么都伤感。你梦想改变世界，但连起床都要挣扎半小时。你善良到让人觉得你是傻子。",
+                quote: "『这个世界会好的...吧？』",
+                traits: ["玻璃心", "理想主义", "拖延症"]
+            },
+            // 内向+直觉+思考+感知
+            "0110": { 
+                face: "🤓", code: "📚·🔍·💭·🎲", name: "杠精学术派", 
+                desc: "你是辩论赛冠军，抬杠界天花板。任何话题你都能找到逻辑漏洞，成功把天聊死。你的脑子里装满了奇怪的知识。",
+                quote: "『从逻辑上来说，你这个观点有问题』",
+                traits: ["逻辑怪", "知识渊博", "生活白痴"]
+            },
+            // 外向+实感+思考+感知
+            "1100": { 
+                face: "😏", code: "🎉·🔥·🎤·🤘", name: "社交牛逼症患者", 
+                desc: "你是派对之王，气氛组组长。你能和保安聊成兄弟，和外卖小哥拜把子。但你有时候太嗨，容易变成别人的社死现场。",
+                quote: "『这有什么不敢的？看我的！』",
+                traits: ["社牛本牛", "冒险家", "戏精"]
+            },
+            // 外向+实感+情感+感知
+            "1101": { 
+                face: "🕺", code: "🐕·🎶·🍕·😂", name: "快乐修勾", 
+                desc: "你是行走的表情包，自带BGM的男人/女人。你的人生信条是：开心就完事了！你的朋友觉得你很吵，但没你又不行。",
+                quote: "『哈哈哈哈哈哈』（笑点超低）",
+                traits: ["气氛担当", "吃货", "忘性大"]
+            },
+            // 外向+直觉+情感+感知
+            "1111": { 
+                face: "🤪", code: "🚀·🌈·💡·🎪", name: "脱缰的野马", 
+                desc: "你的想法多到爆炸，但执行力约等于零。你今天想当宇航员，明天想开煎饼摊。你的朋友永远猜不到你下一步要干嘛。",
+                quote: "『我有一个绝妙的主意！』（然后忘了）",
+                traits: ["脑洞大开", "三分钟热度", "社交蝴蝶"]
+            },
+            // 外向+直觉+思考+感知
+            "1110": { 
+                face: "👹", code: "🗣️·⚔️·🎭·🌀", name: "杠精中的战斗精", 
+                desc: "你是辩论鬼才，能把黑的说成白的。你享受和人抬杠的过程，不是因为你坏，是因为你单纯觉得好玩。你的朋友又爱又恨你。",
+                quote: "『你说得对，但是...』（然后杠一小时）",
+                traits: ["诡辩天才", "叛逆期永驻", "嘴炮王者"]
+            },
+            // 外向+实感+思考+判断
+            "1000": { 
+                face: "👔", code: "📈·⏰·💼·👑", name: "霸道总裁mini版", 
+                desc: "你是天生的领导（其实就是爱管闲事）。你觉得效率就是生命，拖延就是犯罪。你的口头禅是“快点”，你的朋友被你催到想拉黑你。",
+                quote: "『方案呢？进度呢？结果呢？』",
+                traits: ["控制狂", "工作狂", "时间警察"]
+            },
+            // 外向+实感+情感+判断
+            "1001": { 
+                face: "🤗", code: "📢·❤️·☕·🤝", name: "居委会大妈/大爷", 
+                desc: "你是朋友圈的热心肠，谁分手你安慰，谁搬家你帮忙。但你有时候太热心，让人觉得有点烦。你是行走的八卦接收器。",
+                quote: "『我跟你说个事你别告诉别人啊』",
+                traits: ["热心过头", "八卦中心", "聚会组织者"]
+            },
+            // 外向+直觉+情感+判断
+            "1011": { 
+                face: "🌟", code: "💪·📖·🎯·🌈", name: "鸡汤批发商", 
+                desc: "你是励志大师，朋友圈里的人生导师。你擅长给别人打鸡血，但自己的日子过得一团糟。你的朋友觉得你很正能量，其实你也在硬撑。",
+                quote: "『你可以的！相信自己！』（对自己说）",
+                traits: ["人脉王", "情感导师", "外强中干"]
+            },
+            // 外向+直觉+思考+判断
+            "1010": { 
+                face: "👑", code: "⚡·📊·🏆·💀", name: "宇宙级卷王", 
+                desc: "你是行走的KPI，人形自走卷心菜。你觉得休息就是浪费生命，加班才是人间正道。你的下属想打死你，你的上司爱死你。",
+                quote: "『这个月目标翻倍！』（众人晕倒）",
+                traits: ["野心勃勃", "效率狂魔", "无情机器"]
+            }
+        };
+
+        let currentIndex = 0;
+        let answers = new Array(questions.length).fill(3);
+        let dimScores = { dim1: 0, dim2: 0, dim3: 0, dim4: 0 };
+        const app = document.getElementById("app");
+
+        // 生成漂浮表情
+        function createFloatingEmojis() {
+            const container = document.getElementById("floatingEmojis");
+            const emojis = ["😂", "🤣", "🥴", "😜", "🤪", "😭", "😱", "🤡", "👻", "💩", "🫠", "🥲", "😺", "🐶"];
+            for (let i = 0; i < 50; i++) {
+                const emoji = document.createElement("div");
+                emoji.className = "floating-emoji";
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = Math.random() * 100 + "%";
+                emoji.style.animationDelay = Math.random() * 15 + "s";
+                emoji.style.animationDuration = 10 + Math.random() * 15 + "s";
+                emoji.style.fontSize = (Math.random() * 40 + 25) + "px";
+                container.appendChild(emoji);
+            }
+        }
+        createFloatingEmojis();
+
+        function render() {
+            if (currentIndex < questions.length) {
+                renderQuestion();
+            } else {
+                calculateAndRenderResult();
+            }
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIndex];
+            const progress = ((currentIndex) / questions.length) * 100;
+            const currentAnswer = answers[currentIndex];
+            
+            let scoreBtns = '';
+            const labels = ['', '😑 超级左', '🙂 偏左', '😐 中立', '🙃 偏右', '🤪 超级右'];
+            for (let i = 1; i <= 5; i++) {
+                const isSelected = currentAnswer === i;
+                scoreBtns += `
+                    <div class="score-btn ${isSelected ? 'selected' : ''}" onclick="setAnswer(${i})">
+                        <div class="score-value">${i}</div>
+                        <div class="score-label">${labels[i]}</div>
+                    </div>
+                `;
+            }
+            
+            const html = `
+                <div class="progress-area">
+                    <div class="progress-stats">
+                        <span>🤡 第 ${currentIndex + 1} 问 / ${questions.length}</span>
+                        <span>${Math.round(progress)}%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                </div>
+                <div class="card fade-in">
+                    <div class="question-header">
+                        <span class="question-num">🎭 灵魂拷问</span>
+                        <span class="question-cat">${q.left}  ⇄  ${q.right}</span>
+                    </div>
+                    <div class="question-text">${q.text}</div>
+                    <div class="score-options">
+                        ${scoreBtns}
+                    </div>
+                    <div class="nav-buttons">
+                        ${currentIndex > 0 ? '<button class="btn btn-prev" onclick="prevQuestion()">◀ 上一题</button>' : '<div style="flex:1"></div>'}
+                        <button class="btn btn-next" onclick="nextQuestion()">${currentIndex === questions.length - 1 ? '🎉 鉴完收工 🎉' : '下一题 ▶'}</button>
+                    </div>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        window.setAnswer = function(value) {
+            answers[currentIndex] = value;
+            renderQuestion();
+        };
+
+        window.prevQuestion = function() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                render();
+            }
+        };
+
+        window.nextQuestion = function() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                currentIndex++;
+                render();
+            }
+        };
+
+        function calculateAndRenderResult() {
+            // 计算每个维度的平均分 (1-5分)
+            let dim1Sum = 0, dim2Sum = 0, dim3Sum = 0, dim4Sum = 0;
+            let dim1Count = 0, dim2Count = 0, dim3Count = 0, dim4Count = 0;
+            
+            for (let i = 0; i < questions.length; i++) {
+                const score = answers[i];
+                const dim = questions[i].dim;
+                const mapped = score - 3; // -2到2
+                if (dim === "dim1") { dim1Sum += mapped; dim1Count++; }
+                else if (dim === "dim2") { dim2Sum += mapped; dim2Count++; }
+                else if (dim === "dim3") { dim3Sum += mapped; dim3Count++; }
+                else if (dim === "dim4") { dim4Sum += mapped; dim4Count++; }
+            }
+            
+            // 确定每个维度的方向 (0=左倾向, 1=右倾向)
+            const dim1 = (dim1Sum / dim1Count) >= 0 ? 1 : 0;  // 1=外向,0=内向
+            const dim2 = (dim2Sum / dim2Count) >= 0 ? 1 : 0;  // 1=直觉,0=实感
+            const dim3 = (dim3Sum / dim3Count) >= 0 ? 1 : 0;  // 1=情感,0=思考
+            const dim4 = (dim4Sum / dim4Count) >= 0 ? 1 : 0;  // 1=感知,0=判断
+            
+            // 组合成4位二进制代码
+            const code = `${dim1}${dim2}${dim3}${dim4}`;
+            const result = personalities[code] || personalities["0111"];
+            
+            let traitsHtml = result.traits.map(t => `<span class="trait-bubble">#${t}</span>`).join('');
+            
+            const html = `
+                <div class="card result-card fade-in">
+                    <div class="funny-face">${result.face}</div>
+                    <div class="abstract-code">${result.code}</div>
+                    <div class="personality-name">${result.name}</div>
+                    <div class="funny-desc">
+                        <p>${result.desc}</p>
+                        <div class="quote">${result.quote}</div>
+                    </div>
+                    <div class="trait-bubbles">
+                        ${traitsHtml}
+                    </div>
+                    <button class="restart-btn" onclick="restartTest()">🔄 重新鉴定（不服再测）</button>
+                </div>
+            `;
+            app.innerHTML = html;
+        }
+
+        window.restartTest = function() {
+            currentIndex = 0;
+            answers = new Array(questions.length).fill(3);
+            render();
+        };
+
+        render();
+    </script>
+</body>
+</html>
